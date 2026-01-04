@@ -9,8 +9,12 @@ const withBundleAnalyzer = bundleAnalyzer({
 })
 
 export default withBundleAnalyzer({
+  output: 'export', // ✅ 新增：开启静态导出（Next14+ 的正确方式）
+
   staticPageGenerationTimeout: 300,
+
   images: {
+    unoptimized: true, // ✅ 新增：静态导出必须关闭 next/image 优化
     remotePatterns: [
       { protocol: 'https', hostname: 'www.notion.so' },
       { protocol: 'https', hostname: 'notion.so' },
@@ -25,9 +29,6 @@ export default withBundleAnalyzer({
   },
 
   webpack: (config) => {
-    // Workaround for ensuring that `react` and `react-dom` resolve correctly
-    // when using a locally-linked version of `react-notion-x`.
-    // @see https://github.com/vercel/next.js/issues/50391
     const dirname = path.dirname(fileURLToPath(import.meta.url))
     config.resolve.alias.react = path.resolve(dirname, 'node_modules/react')
     config.resolve.alias['react-dom'] = path.resolve(
@@ -37,6 +38,5 @@ export default withBundleAnalyzer({
     return config
   },
 
-  // See https://react-tweet.vercel.app/next#troubleshooting
   transpilePackages: ['react-tweet']
 })
